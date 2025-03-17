@@ -1,7 +1,6 @@
 import { Music, MusicTable } from "@/components/music-table";
 import { useStore } from "@/zustand/store";
 import { Suspense, useMemo } from "react";
-import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 
 export default function Home() {
@@ -17,7 +16,7 @@ export default function Home() {
 
   return (
     <div>
-      <AudioPlayer autoPlay src={url} />
+      <audio controls autoPlay src={url} />
       <Suspense>
         <MusicTable promise={musicList} />
       </Suspense>
