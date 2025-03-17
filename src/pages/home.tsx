@@ -1,22 +1,39 @@
 import { Music, MusicTable } from "@/components/music-table";
 import { useStore } from "@/zustand/store";
-import { Suspense, useMemo } from "react";
-import "react-h5-audio-player/lib/styles.css";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 
 export default function Home() {
   const title = useStore((state) => state.title);
   const author = useStore((state) => state.author);
+  const volume = useStore((state) => state.volume);
+  const setVolume = useStore((state) => state.setVolume);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const musicList = useMemo(async () => {
     const response = await fetch(`https://ytmdl-music-server.vercel.app/api/list`);
     const json = (await response.json()) as Music[];
     return json;
   }, []);
 
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
+
   const url = `https://ytmdl-music-server.vercel.app/api?author=${author}&title=${title}`;
 
   return (
     <div>
-      <audio controls autoPlay src={url} />
+      <audio
+        ref={audioRef}
+        onVolumeChange={(e) => {
+          setVolume(e.currentTarget.volume);
+        }}
+        controls
+        autoPlay
+        src={url}
+      />
+      <input type="range" min="0" max="1" step="0.01" value={volume} onChange={(e) => setVolume(parseFloat(e.target.value))} />
       <Suspense>
         <MusicTable promise={musicList} />
       </Suspense>
