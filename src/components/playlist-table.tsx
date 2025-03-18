@@ -1,5 +1,4 @@
-import { ColumnDef, SortingState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
+import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useStore } from "@/zustand/store";
-import { use, useEffect } from "react";
 
 export type Music = {
   title: string;
@@ -30,53 +28,28 @@ export const columns: ColumnDef<Music>[] = [
   },
   {
     accessorKey: "author",
-    header: ({ column }) => {
-      return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          가수명
-          <ArrowUpDown />
-        </Button>
-      );
-    },
+    header: "가수명",
     cell: ({ row }) => <div>{row.getValue("author")}</div>,
   },
   {
     accessorKey: "title",
-    header: ({ column }) => {
-      return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          곡명
-          <ArrowUpDown />
-        </Button>
-      );
-    },
+    header: "곡명",
     cell: ({ row }) => <div>{row.getValue("title")}</div>,
   },
 ];
 
-export function MusicTable({ promise }: { promise: Promise<Music[]> }) {
-  const data = use(promise);
-  const setAllMusic = useStore((state) => state.setAllMusic);
-  useEffect(() => {
-    setAllMusic(data);
-  }, [data, setAllMusic]);
-
+export function PlaylistTable({ data }: { data: Music[] }) {
   const setTitle = useStore((state) => state.setTitle);
   const setAuthor = useStore((state) => state.setAuthor);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
     data,
     columns,
-    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     onRowSelectionChange: setRowSelection,
     state: {
-      sorting,
       rowSelection,
     },
   });

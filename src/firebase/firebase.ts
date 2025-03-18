@@ -6,5 +6,5 @@ import { firebaseConfig } from "./constants";
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Initialize Firebase
-export const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
