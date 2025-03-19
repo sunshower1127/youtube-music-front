@@ -1,18 +1,14 @@
 import { ColumnDef, SortingState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
-import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { setPlaylist as setFirebasePlaylist } from "@/firebase/firebase";
+import { Music } from "@/utils/music";
 import { useStore } from "@/zustand/store";
-import { use, useEffect } from "react";
-
-export type Music = {
-  title: string;
-  author: string;
-};
+import { useState } from "react";
 
 export const columns: ColumnDef<Music>[] = [
   {
@@ -27,6 +23,11 @@ export const columns: ColumnDef<Music>[] = [
     cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />,
     enableSorting: false,
     enableHiding: false,
+  },
+  {
+    accessorKey: "thumbnail",
+    header: "썸네일",
+    cell: ({ row }) => <img className="aspect-square object-cover h-10" src={row.original.thumbnail} />,
   },
   {
     accessorKey: "author",
@@ -54,20 +55,15 @@ export const columns: ColumnDef<Music>[] = [
   },
 ];
 
-export function MusicTable({ promise }: { promise: Promise<Music[]> }) {
-  const data = use(promise);
-  const setAllMusic = useStore((state) => state.setAllMusic);
-  useEffect(() => {
-    setAllMusic(data);
-  }, [data, setAllMusic]);
-
-  const setTitle = useStore((state) => state.setTitle);
-  const setAuthor = useStore((state) => state.setAuthor);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [rowSelection, setRowSelection] = React.useState({});
+export function MusicTable() {
+  const playlists = useStore((state) => state.playlists);
+  const completePlaylist = playlists.get("All") ?? [];
+  const { setPlaylist } = useStore((state) => state.actions);
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [rowSelection, setRowSelection] = useState({});
 
   const table = useReactTable({
-    data,
+    data: completePlaylist,
     columns,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
@@ -81,23 +77,38 @@ export function MusicTable({ promise }: { promise: Promise<Music[]> }) {
     },
   });
 
+  const addPlaylist = async () => {
+    if (!table.getFilteredSelectedRowModel().rows.length) return;
+    const selectedMusics = table.getFilteredSelectedRowModel().rows.map((row) => row.original);
+    const playlistTitle = prompt("Enter playlist name");
+    if (!playlistTitle) return;
+    setPlaylist(playlistTitle, selectedMusics);
+    await setFirebasePlaylist(playlistTitle, selectedMusics);
+  };
+
+  console.log(rowSelection);
+
   return (
-    <div className="w-full">
-      <div className="flex items-center py-4">
-        <label htmlFor="author">가수명:</label>
-        <Input
-          id="author"
-          value={(table.getColumn("author")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("author")?.setFilterValue(event.target.value)}
-          className="max-w-sm"
-        />
-        <label htmlFor="title">곡명:</label>
-        <Input
-          id="title"
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)}
-          className="max-w-sm"
-        />
+    <div>
+      <div className="flex flex-col items-center py-4">
+        <div>
+          <label htmlFor="author">가수명</label>
+          <Input
+            id="author"
+            value={(table.getColumn("author")?.getFilterValue() as string) ?? ""}
+            onChange={(event) => table.getColumn("author")?.setFilterValue(event.target.value)}
+            className="max-w-sm"
+          />
+        </div>
+        <div>
+          <label htmlFor="title">곡명</label>
+          <Input
+            id="title"
+            value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+            onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)}
+            className="max-w-sm"
+          />
+        </div>
       </div>
       <div className="rounded-md border">
         <Table>
@@ -113,15 +124,7 @@ export function MusicTable({ promise }: { promise: Promise<Music[]> }) {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  onClick={(e) => {
-                    if (e.target instanceof HTMLButtonElement && e.target.role === "checkbox") return;
-                    setTitle(row.original.title);
-                    setAuthor(row.original.author);
-                  }}
-                >
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                   ))}
@@ -150,6 +153,7 @@ export function MusicTable({ promise }: { promise: Promise<Music[]> }) {
           </Button>
         </div>
       </div>
+      <Button onClick={addPlaylist}>Add Playlist</Button>
     </div>
   );
 }

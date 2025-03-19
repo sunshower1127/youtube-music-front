@@ -1,16 +1,13 @@
 import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
-import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { removePlaylist as removeFirebasePlaylist } from "@/firebase/firebase";
+import { Music } from "@/utils/music";
 import { useStore } from "@/zustand/store";
-
-export type Music = {
-  title: string;
-  author: string;
-};
+import { useState } from "react";
 
 export const columns: ColumnDef<Music>[] = [
   {
@@ -27,6 +24,11 @@ export const columns: ColumnDef<Music>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "thumbnail",
+    header: "썸네일",
+    cell: ({ row }) => <img className="aspect-square object-cover h-10" src={row.original.thumbnail} />,
+  },
+  {
     accessorKey: "author",
     header: "가수명",
     cell: ({ row }) => <div>{row.getValue("author")}</div>,
@@ -38,13 +40,13 @@ export const columns: ColumnDef<Music>[] = [
   },
 ];
 
-export function PlaylistTable({ data }: { data: Music[] }) {
-  const setTitle = useStore((state) => state.setTitle);
-  const setAuthor = useStore((state) => state.setAuthor);
-  const [rowSelection, setRowSelection] = React.useState({});
+export function PlaylistTable({ selectedPlaylist }: { selectedPlaylist: string }) {
+  const playlists = useStore((state) => state.playlists);
+  const { setCurrentPlaylist, setCurrentMusic, removePlaylist } = useStore((state) => state.actions);
+  const [rowSelection, setRowSelection] = useState({});
 
   const table = useReactTable({
-    data,
+    data: playlists.get(selectedPlaylist) ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -53,6 +55,13 @@ export function PlaylistTable({ data }: { data: Music[] }) {
       rowSelection,
     },
   });
+
+  const deletePlaylist = async () => {
+    if (selectedPlaylist === "All") return;
+    setCurrentPlaylist("All");
+    removePlaylist(selectedPlaylist);
+    await removeFirebasePlaylist(selectedPlaylist);
+  };
 
   return (
     <div className="w-full">
@@ -91,8 +100,8 @@ export function PlaylistTable({ data }: { data: Music[] }) {
                   data-state={row.getIsSelected() && "selected"}
                   onClick={(e) => {
                     if (e.target instanceof HTMLButtonElement && e.target.role === "checkbox") return;
-                    setTitle(row.original.title);
-                    setAuthor(row.original.author);
+                    setCurrentPlaylist(selectedPlaylist);
+                    setCurrentMusic(row.index);
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (
@@ -123,6 +132,7 @@ export function PlaylistTable({ data }: { data: Music[] }) {
           </Button>
         </div>
       </div>
+      <Button onClick={deletePlaylist}>Delete Playlist</Button>
     </div>
   );
 }
