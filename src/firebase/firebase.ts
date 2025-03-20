@@ -20,10 +20,10 @@ export const fetchPlaylists = async () => {
   return playlists;
 };
 
-export const removePlaylist = async (title: string) => {
+export const removePlaylist = (title: string) => {
   title = title.replace(/\//g, "\\"); // Firestore에서 /를 사용할 수 없음
   const docRef = doc(db, "playlists", title);
-  await deleteDoc(docRef);
+  deleteDoc(docRef); // 왜 여기에 await 붙이면 무한로딩 걸리는거임? 진짜 모르겠네
 };
 
 export const addPlaylist = async (title: string, musics: Music[]) => {
@@ -38,6 +38,6 @@ export const addPlaylist = async (title: string, musics: Music[]) => {
 
   await setDoc(docRef, {
     createdAt: serverTimestamp(),
-    musics: musics.map(({ author, title }) => ({ author, title })),
+    musics: musics.map(({ author, title, thumbnailColorcode }) => ({ author, title, thumbnailColorcode })),
   });
 };

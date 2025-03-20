@@ -25,18 +25,25 @@ export const columns: ColumnDef<Music>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "thumbnail",
-    header: "썸네일",
+    accessorKey: "thumbnailColorcode",
+    header: ({ column }) => {
+      return (
+        <button className="flex items-center gap-2" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          Album
+          <ArrowUpDown size="15" />
+        </button>
+      );
+    },
     cell: ({ row }) => <img className="aspect-square object-cover h-10" src={row.original.thumbnail} />,
   },
   {
     accessorKey: "author",
     header: ({ column }) => {
       return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          가수명
-          <ArrowUpDown />
-        </Button>
+        <button className="flex items-center gap-2" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          Artist
+          <ArrowUpDown size="15" />
+        </button>
       );
     },
     cell: ({ row }) => <div>{row.getValue("author")}</div>,
@@ -45,10 +52,10 @@ export const columns: ColumnDef<Music>[] = [
     accessorKey: "title",
     header: ({ column }) => {
       return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          곡명
-          <ArrowUpDown />
-        </Button>
+        <button className="flex items-center gap-2" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          Song
+          <ArrowUpDown size="15" />
+        </button>
       );
     },
     cell: ({ row }) => <div>{row.getValue("title")}</div>,
@@ -78,8 +85,12 @@ export function MusicTable() {
   });
 
   const addPlaylist = async () => {
-    if (!table.getFilteredSelectedRowModel().rows.length) return;
-    const selectedMusics = table.getFilteredSelectedRowModel().rows.map((row) => row.original);
+    const selectedMusics = table
+      .getSortedRowModel()
+      .rows.filter((row) => row.getIsSelected())
+      .map((row) => row.original);
+
+    if (!selectedMusics.length) return;
     const today = new Date();
     const month = today.getMonth() + 1;
     const day = today.getDate();
@@ -91,15 +102,16 @@ export function MusicTable() {
 
   return (
     <div className="flex flex-col w-full p-2 border gap-2">
+      <p className="self-center mb-2">All Music</p>
       <Button className="w-28" onClick={addPlaylist}>
-        Add Playlist
+        ✚ Playlist
       </Button>
       <div className="grid grid-cols-2 grid-rows-2 gap-x-2 h-12 mb-4">
         <label className="text-sm font-light" htmlFor="author">
-          가수명
+          Artist
         </label>
         <label className="text-sm font-light" htmlFor="title">
-          곡명
+          Song
         </label>
         <Input className="h-8" id="author" value={(table.getColumn("author")?.getFilterValue() as string) ?? ""} onChange={(event) => table.getColumn("author")?.setFilterValue(event.target.value)} />
         <Input className="h-8" id="title" value={(table.getColumn("title")?.getFilterValue() as string) ?? ""} onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)} />

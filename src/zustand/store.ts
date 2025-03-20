@@ -3,10 +3,12 @@ import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
 export const useStore = create<{
+  refreshTrigger: boolean;
   playlists: Map<string, Music[]>;
   currentPlaylist: string;
   currentMusic: number;
   actions: {
+    refresh(): void;
     setPlaylist: (title: string, musics: Music[]) => void;
     removePlaylist: (title: string) => void;
     setCurrentPlaylist: (title: string) => void;
@@ -19,10 +21,13 @@ export const useStore = create<{
   devtools(
     persist(
       (set, get) => ({
+        refreshTrigger: false,
         playlists: new Map(),
         currentPlaylist: "",
         currentMusic: 0,
         actions: {
+          refresh: () => set((state) => ({ refreshTrigger: !state.refreshTrigger })),
+
           setPlaylist: (title, musics) => {
             musics = musics.map((music) => ({ ...music, thumbnail: music.thumbnail || `https://ytmdl-music-server.vercel.app/api/thumbnail?author=${music.author}&title=${music.title}` }));
             set((state) => {

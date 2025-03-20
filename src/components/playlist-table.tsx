@@ -24,17 +24,17 @@ export const columns: ColumnDef<Music>[] = [
   },
   {
     accessorKey: "thumbnail",
-    header: "썸네일",
+    header: "Album",
     cell: ({ row }) => <img className="aspect-square object-cover h-10" src={row.original.thumbnail} />,
   },
   {
     accessorKey: "author",
-    header: "가수명",
+    header: "Artist",
     cell: ({ row }) => <div>{row.getValue("author")}</div>,
   },
   {
     accessorKey: "title",
-    header: "곡명",
+    header: "Song",
     cell: ({ row }) => <div>{row.getValue("title")}</div>,
   },
 ];
@@ -60,10 +60,10 @@ export function PlaylistTable({ selectedPlaylist }: { selectedPlaylist: string }
     <div className="w-full p-2">
       <div className="grid grid-cols-2 grid-rows-2 gap-x-2 h-12 mb-4">
         <label className="text-sm font-light" htmlFor="author">
-          가수명
+          Artist
         </label>
         <label className="text-sm font-light" htmlFor="title">
-          곡명
+          Song
         </label>
         <Input className="h-8" id="author" value={(table.getColumn("author")?.getFilterValue() as string) ?? ""} onChange={(event) => table.getColumn("author")?.setFilterValue(event.target.value)} />
         <Input className="h-8" id="title" value={(table.getColumn("title")?.getFilterValue() as string) ?? ""} onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)} />

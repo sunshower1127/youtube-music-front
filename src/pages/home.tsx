@@ -7,6 +7,7 @@ import { useStore } from "@/zustand/store";
 import { useEffect } from "react";
 
 export default function Home() {
+  const refreshTrigger = useStore((state) => state.refreshTrigger);
   const { setPlaylist } = useStore((state) => state.actions);
 
   useEffect(() => {
@@ -19,7 +20,7 @@ export default function Home() {
         setPlaylist(title, musics);
       });
     })();
-  }, [setPlaylist]);
+  }, [setPlaylist, refreshTrigger]); // 새로고침용
 
   return (
     <div className="flex flex-col items-center">

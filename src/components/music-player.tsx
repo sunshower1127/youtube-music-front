@@ -1,12 +1,11 @@
 import { useStore } from "@/zustand/store";
 import { useCallback } from "react";
-import { Button } from "./ui/button";
 
 export default function MusicPlayer() {
   const playlists = useStore((state) => state.playlists);
   const currentPlaylist = useStore((state) => state.currentPlaylist);
   const currentMusic = useStore((state) => state.currentMusic);
-  const { prevMusic, nextMusic, shuffleCurrentPlaylist } = useStore((state) => state.actions);
+  const { prevMusic, nextMusic } = useStore((state) => state.actions);
 
   let [author, title, thumbnail] = ["", "", ""];
   if (currentPlaylist) {
@@ -45,27 +44,25 @@ export default function MusicPlayer() {
       style={{
         backgroundImage: thumbnail ? `url(${encodeURI(thumbnail)})` : undefined, // 안해주면 띄어쓰기 있는 애들한테 에러남
         backgroundSize: "cover",
+        textShadow: "2px 2px 2px gray",
       }}
     >
-      <div className="relative">
-        <p className="relative mix-blend-difference font-serif">{currentPlaylist}</p>
-        <button className="absolute top-0 -right-7 text-lg" onClick={shuffleCurrentPlaylist}>
-          🔀
-        </button>
+      <div>
+        <p className="font-serif">{currentPlaylist}</p>
       </div>
-      <div className="flex flex-row w-full justify-between items-center mix-blend-difference">
-        <Button variant="ghost" className="" onClick={prevMusic}>
+      <div className="flex flex-row w-full justify-center gap-3 items-center">
+        <div className="p-2 pb-3 cursor-pointer" onClick={prevMusic}>
           {"<<"}
-        </Button>
+        </div>
 
-        <p className="mix-blend-difference font-serif">
+        <p className=" font-serif">
           {author} - {title}
         </p>
-        <Button className="mix-blend-difference" variant="ghost" onClick={nextMusic}>
+        <div className="p-2 pb-3 cursor-pointer" onClick={nextMusic}>
           {">>"}
-        </Button>
+        </div>
       </div>
-      <audio ref={handleRef} autoPlay controls src={url} onEnded={nextMusic} />
+      <audio className="mb-1 shadow-2xl" ref={handleRef} autoPlay controls src={url} onEnded={nextMusic} />
     </div>
   );
 }
