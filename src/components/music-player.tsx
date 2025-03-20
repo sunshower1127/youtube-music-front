@@ -17,11 +17,12 @@ export default function MusicPlayer() {
     }
   }
 
-  const url = `https://ytmdl-music-server.vercel.app/api?author=${author}&title=${title}`;
+  const url = `https://ytmdl-music-server.vercel.app/api?author=${encodeURIComponent(author)}&title=${encodeURIComponent(title)}`;
 
   const handleRef = useCallback(
     (audioElement: HTMLAudioElement) => {
       if (audioElement === null) return; // 이걸 꼭 추가해줘야함(이유는 모르겠음)
+      audioElement.volume = 0.5;
       if ("mediaSession" in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
           title,
@@ -42,7 +43,7 @@ export default function MusicPlayer() {
     <div
       className="flex justify-end flex-col items-center aspect-square w-full"
       style={{
-        backgroundImage: thumbnail ? `url(${encodeURI(thumbnail)})` : undefined, // 안해주면 띄어쓰기 있는 애들한테 에러남
+        backgroundImage: thumbnail ? `url(${thumbnail})` : undefined,
         backgroundSize: "cover",
         textShadow: "2px 2px 2px gray",
       }}

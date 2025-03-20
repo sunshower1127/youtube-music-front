@@ -29,7 +29,10 @@ export const useStore = create<{
           refresh: () => set((state) => ({ refreshTrigger: !state.refreshTrigger })),
 
           setPlaylist: (title, musics) => {
-            musics = musics.map((music) => ({ ...music, thumbnail: music.thumbnail || `https://ytmdl-music-server.vercel.app/api/thumbnail?author=${music.author}&title=${music.title}` }));
+            musics = musics.map((music) => ({
+              ...music,
+              thumbnail: music.thumbnail || `https://ytmdl-music-server.vercel.app/api/thumbnail?author=${encodeURIComponent(music.author)}&title=${encodeURIComponent(music.title)}`,
+            }));
             set((state) => {
               const newPlaylists = new Map(state.playlists);
               newPlaylists.set(title, musics);
