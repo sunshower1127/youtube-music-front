@@ -40,27 +40,32 @@ export default function MusicPlayer() {
   );
 
   return (
-    <div className="flex flex-col items-center border">
-      <img className="aspect-square object-cover w-1/2" src={thumbnail} />
+    <div
+      className="flex justify-end flex-col items-center aspect-square w-full"
+      style={{
+        backgroundImage: thumbnail ? `url(${encodeURI(thumbnail)})` : undefined, // 안해주면 띄어쓰기 있는 애들한테 에러남
+        backgroundSize: "cover",
+      }}
+    >
       <div className="relative">
-        <p className="relative">{currentPlaylist}</p>
+        <p className="relative mix-blend-difference font-serif">{currentPlaylist}</p>
         <button className="absolute top-0 -right-7 text-lg" onClick={shuffleCurrentPlaylist}>
           🔀
         </button>
       </div>
-      <div className="flex flex-row w-full justify-between items-center">
+      <div className="flex flex-row w-full justify-between items-center mix-blend-difference">
         <Button variant="ghost" className="" onClick={prevMusic}>
           {"<<"}
         </Button>
 
-        <p>
+        <p className="mix-blend-difference font-serif">
           {author} - {title}
         </p>
-        <Button variant="ghost" onClick={nextMusic}>
+        <Button className="mix-blend-difference" variant="ghost" onClick={nextMusic}>
           {">>"}
         </Button>
       </div>
-      <audio ref={handleRef} controls autoPlay src={url} onEnded={nextMusic} />
+      <audio ref={handleRef} autoPlay controls src={url} onEnded={nextMusic} />
     </div>
   );
 }

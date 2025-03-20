@@ -1,10 +1,9 @@
-import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
+import { ColumnDef, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { removePlaylist as removeFirebasePlaylist } from "@/firebase/firebase";
 import { Music } from "@/utils/music";
 import { useStore } from "@/zustand/store";
 import { useState } from "react";
@@ -42,7 +41,7 @@ export const columns: ColumnDef<Music>[] = [
 
 export function PlaylistTable({ selectedPlaylist }: { selectedPlaylist: string }) {
   const playlists = useStore((state) => state.playlists);
-  const { setCurrentPlaylist, setCurrentMusic, removePlaylist } = useStore((state) => state.actions);
+  const { setCurrentPlaylist, setCurrentMusic } = useStore((state) => state.actions);
   const [rowSelection, setRowSelection] = useState({});
 
   const table = useReactTable({
@@ -51,35 +50,23 @@ export function PlaylistTable({ selectedPlaylist }: { selectedPlaylist: string }
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onRowSelectionChange: setRowSelection,
+    getFilteredRowModel: getFilteredRowModel(),
     state: {
       rowSelection,
     },
   });
 
-  const deletePlaylist = async () => {
-    if (selectedPlaylist === "All") return;
-    setCurrentPlaylist("All");
-    removePlaylist(selectedPlaylist);
-    await removeFirebasePlaylist(selectedPlaylist);
-  };
-
   return (
-    <div className="w-full">
-      <div className="flex items-center py-4">
-        <label htmlFor="author">가수명:</label>
-        <Input
-          id="author"
-          value={(table.getColumn("author")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("author")?.setFilterValue(event.target.value)}
-          className="max-w-sm"
-        />
-        <label htmlFor="title">곡명:</label>
-        <Input
-          id="title"
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)}
-          className="max-w-sm"
-        />
+    <div className="w-full p-2">
+      <div className="grid grid-cols-2 grid-rows-2 gap-x-2 h-12 mb-4">
+        <label className="text-sm font-light" htmlFor="author">
+          가수명
+        </label>
+        <label className="text-sm font-light" htmlFor="title">
+          곡명
+        </label>
+        <Input className="h-8" id="author" value={(table.getColumn("author")?.getFilterValue() as string) ?? ""} onChange={(event) => table.getColumn("author")?.setFilterValue(event.target.value)} />
+        <Input className="h-8" id="title" value={(table.getColumn("title")?.getFilterValue() as string) ?? ""} onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)} />
       </div>
       <div className="rounded-md border">
         <Table>
@@ -132,7 +119,6 @@ export function PlaylistTable({ selectedPlaylist }: { selectedPlaylist: string }
           </Button>
         </div>
       </div>
-      <Button onClick={deletePlaylist}>Delete Playlist</Button>
     </div>
   );
 }

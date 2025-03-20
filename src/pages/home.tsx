@@ -13,9 +13,7 @@ export default function Home() {
     (async () => {
       const completeMusicList = await fetchMusicList();
       setPlaylist("All", completeMusicList);
-    })();
 
-    (async () => {
       const playlists = await fetchPlaylists();
       playlists.forEach((musics, title) => {
         setPlaylist(title, musics);
@@ -24,11 +22,13 @@ export default function Home() {
   }, [setPlaylist]);
 
   return (
-    <main className="flex flex-col items-center gap-10">
-      <MusicPlayer />
-      <Playlist />
-      <MusicTable />
-    </main>
+    <div className="flex flex-col items-center">
+      <main className="flex flex-col items-center gap-10 max-w-100">
+        <MusicPlayer />
+        <Playlist />
+        <MusicTable />
+      </main>
+    </div>
   );
 }
 

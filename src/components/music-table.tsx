@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { setPlaylist as setFirebasePlaylist } from "@/firebase/firebase";
+import { addPlaylist as setFirebasePlaylist } from "@/firebase/firebase";
 import { Music } from "@/utils/music";
 import { useStore } from "@/zustand/store";
 import { useState } from "react";
@@ -80,35 +80,29 @@ export function MusicTable() {
   const addPlaylist = async () => {
     if (!table.getFilteredSelectedRowModel().rows.length) return;
     const selectedMusics = table.getFilteredSelectedRowModel().rows.map((row) => row.original);
-    const playlistTitle = prompt("Enter playlist name");
+    const today = new Date();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+    const playlistTitle = prompt("Enter playlist name", `${month}/${day}`);
     if (!playlistTitle) return;
     setPlaylist(playlistTitle, selectedMusics);
     await setFirebasePlaylist(playlistTitle, selectedMusics);
   };
 
-  console.log(rowSelection);
-
   return (
-    <div>
-      <div className="flex flex-col items-center py-4">
-        <div>
-          <label htmlFor="author">가수명</label>
-          <Input
-            id="author"
-            value={(table.getColumn("author")?.getFilterValue() as string) ?? ""}
-            onChange={(event) => table.getColumn("author")?.setFilterValue(event.target.value)}
-            className="max-w-sm"
-          />
-        </div>
-        <div>
-          <label htmlFor="title">곡명</label>
-          <Input
-            id="title"
-            value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-            onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)}
-            className="max-w-sm"
-          />
-        </div>
+    <div className="flex flex-col w-full p-2 border gap-2">
+      <Button className="w-28" onClick={addPlaylist}>
+        Add Playlist
+      </Button>
+      <div className="grid grid-cols-2 grid-rows-2 gap-x-2 h-12 mb-4">
+        <label className="text-sm font-light" htmlFor="author">
+          가수명
+        </label>
+        <label className="text-sm font-light" htmlFor="title">
+          곡명
+        </label>
+        <Input className="h-8" id="author" value={(table.getColumn("author")?.getFilterValue() as string) ?? ""} onChange={(event) => table.getColumn("author")?.setFilterValue(event.target.value)} />
+        <Input className="h-8" id="title" value={(table.getColumn("title")?.getFilterValue() as string) ?? ""} onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)} />
       </div>
       <div className="rounded-md border">
         <Table>
@@ -153,7 +147,6 @@ export function MusicTable() {
           </Button>
         </div>
       </div>
-      <Button onClick={addPlaylist}>Add Playlist</Button>
     </div>
   );
 }
