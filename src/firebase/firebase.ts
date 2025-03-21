@@ -38,6 +38,6 @@ export const addPlaylist = async (title: string, musics: Music[]) => {
 
   await setDoc(docRef, {
     createdAt: serverTimestamp(),
-    musics: musics.map(({ author, title, thumbnailColorcode }) => ({ author, title, thumbnailColorcode })),
+    musics: musics.map(({ author, title, thumbnailColorcode, musicValue }) => ({ author, title, thumbnailColorcode, musicValue })),
   });
 };

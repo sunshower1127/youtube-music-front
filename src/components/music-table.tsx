@@ -25,7 +25,7 @@ export const columns: ColumnDef<Music>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "thumbnailColorcode",
+    accessorKey: "thumbnailHue",
     header: ({ column }) => {
       return (
         <button className="flex items-center gap-2" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>

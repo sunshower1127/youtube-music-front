@@ -1,3 +1,4 @@
+import { hexToHue } from "@/utils/color";
 import { Music } from "@/utils/music";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
@@ -16,6 +17,7 @@ export const useStore = create<{
     nextMusic: () => void;
     prevMusic: () => void;
     shuffleCurrentPlaylist: () => void;
+    sortCurrentPlaylist: (sortType: "emotion" | "energy", order: "asc" | "desc") => void;
   };
 }>()(
   devtools(
@@ -32,6 +34,7 @@ export const useStore = create<{
             musics = musics.map((music) => ({
               ...music,
               thumbnail: music.thumbnail || `https://ytmdl-music-server.vercel.app/api/thumbnail?author=${encodeURIComponent(music.author)}&title=${encodeURIComponent(music.title)}`,
+              thumbnailHue: hexToHue(music.thumbnailColorcode || "000000"),
             }));
             set((state) => {
               const newPlaylists = new Map(state.playlists);
@@ -85,6 +88,23 @@ export const useStore = create<{
                 const j = Math.floor(Math.random() * (i + 1));
                 [newPlaylist[i], newPlaylist[j]] = [newPlaylist[j], newPlaylist[i]];
               }
+
+              const newPlaylists = new Map(state.playlists);
+              newPlaylists.set(state.currentPlaylist, newPlaylist);
+              return { playlists: newPlaylists, currentMusic: 0 };
+            }),
+
+          sortCurrentPlaylist: (sortType, order) =>
+            set((state) => {
+              const playlist = state.playlists.get(state.currentPlaylist);
+              if (!playlist) return {};
+
+              const newPlaylist = [...playlist];
+              newPlaylist.sort((a, b) => {
+                const aValue = a.musicValue[sortType];
+                const bValue = b.musicValue[sortType];
+                return order === "asc" ? aValue - bValue : bValue - aValue;
+              });
 
               const newPlaylists = new Map(state.playlists);
               newPlaylists.set(state.currentPlaylist, newPlaylist);

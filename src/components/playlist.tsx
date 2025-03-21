@@ -6,8 +6,10 @@ import { PlaylistTable } from "./playlist-table";
 export default function Playlist() {
   const playlists = useStore((state) => state.playlists);
   const currentPlaylist = useStore((state) => state.currentPlaylist);
-  const { setCurrentPlaylist, removePlaylist, shuffleCurrentPlaylist, refresh } = useStore((state) => state.actions);
+  const { setCurrentPlaylist, removePlaylist, shuffleCurrentPlaylist, refresh, sortCurrentPlaylist } = useStore((state) => state.actions);
   const [selectedPlaylist, setSelectedPlaylist] = useState(currentPlaylist || "All");
+  const [, setEmotionSort] = useState<"asc" | "desc" | null>(null);
+  const [, setEnergySort] = useState<"asc" | "desc" | null>(null);
 
   const deletePlaylist = async () => {
     if (selectedPlaylist === "All") return;
@@ -41,11 +43,44 @@ export default function Playlist() {
         >
           ⏏️
         </button>
-        <button className="text-4xl" onClick={shuffleCurrentPlaylist}>
+        <button
+          className="text-4xl"
+          onClick={() => {
+            shuffleCurrentPlaylist();
+            setEmotionSort(null);
+            setEnergySort(null);
+          }}
+        >
           🔀
         </button>
         <button className="text-4xl" onClick={refresh}>
           🔄
+        </button>
+        <button
+          className="text-4xl"
+          onClick={() => {
+            setEmotionSort((prev) => {
+              const newOrder = prev === "desc" ? "asc" : "desc";
+              sortCurrentPlaylist("emotion", newOrder);
+              return newOrder;
+            });
+            setEnergySort(null);
+          }}
+        >
+          🥳
+        </button>
+        <button
+          className="text-4xl"
+          onClick={() => {
+            setEnergySort((prev) => {
+              const newOrder = prev === "desc" ? "asc" : "desc";
+              sortCurrentPlaylist("energy", newOrder);
+              return newOrder;
+            });
+            setEmotionSort(null);
+          }}
+        >
+          💪
         </button>
         <button className="text-4xl" onClick={deletePlaylist}>
           ⛔️
