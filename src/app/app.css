@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+@import "@/lib/sw-toolkit/styles/base.css";
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
@@ -114,6 +115,7 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    @apply text-sm;
   }
   body {
     @apply bg-background text-foreground;
