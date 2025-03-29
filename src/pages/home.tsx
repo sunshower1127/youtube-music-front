@@ -23,18 +23,16 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex flex-col items-center">
-        <main className="flex flex-col items-center gap-10 max-w-100">
-          <ErrorBoundary>
-            <Suspense fallback={<div className="fixed inset-0 bg-gray-500 opacity-50 z-10" />}>
-              <MusicPlayer />
-              <NowPlaying />
-              <Playlist />
-              <MusicLibrary />
-            </Suspense>
-          </ErrorBoundary>
-        </main>
-      </div>
+      <main className="flex flex-col items-center w-dvw gap-20">
+        <ErrorBoundary>
+          <Suspense fallback={<div className="fixed inset-0 bg-gray-500 opacity-50 z-10" />}>
+            <MusicPlayer />
+            <NowPlaying />
+            <Playlist />
+            <MusicLibrary />
+          </Suspense>
+        </ErrorBoundary>
+      </main>
     </>
   );
 }

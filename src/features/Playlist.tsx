@@ -6,15 +6,23 @@ import { useStore } from "@/zustand/store.ts";
 import { useState } from "react";
 
 export default function Playlist() {
-  const { playlists } = usePlaylist();
+  const { playlists, deletePlaylist } = usePlaylist();
   const [playlistName, setPlaylistName] = useState("");
   const [selection, setSelection] = useState<Record<number, boolean>>({});
   const { setNowPlaying } = useStore((state) => state.actions);
+
   const handleListen = () => {
     setNowPlaying(playlists.get(playlistName) || []);
   };
+
+  const handleDelete = () => {
+    deletePlaylist({ playlistName });
+    setPlaylistName("");
+    setSelection({});
+  };
+
   return (
-    <section>
+    <section className="w-dvw">
       <h2 className="text-2xl font-bold">Playlist</h2>
       <Select value={playlistName} onValueChange={setPlaylistName}>
         <SelectTrigger>
@@ -30,7 +38,12 @@ export default function Playlist() {
       </Select>
 
       <MusicTable musics={playlists.get(playlistName) || []} selection={selection} onSelectionChange={setSelection} />
-      <Button onClick={handleListen}>Listen</Button>
+      <div className="flex flex-row gap-2">
+        <Button onClick={handleListen}>Listen</Button>
+        <Button variant="destructive" onClick={handleDelete}>
+          Delete
+        </Button>
+      </div>
     </section>
   );
 }

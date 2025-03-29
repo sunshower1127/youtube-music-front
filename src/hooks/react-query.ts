@@ -34,7 +34,7 @@ export function usePlaylist() {
     },
   });
   const { mutate: deletePlaylist } = useMutation({
-    mutationFn: ({ playlistName }: { playlistName: string; musics: Music[] }) => firestore.deletePlaylist(playlistName),
+    mutationFn: ({ playlistName }: { playlistName: string }) => firestore.deletePlaylist(playlistName),
     onMutate: async ({ playlistName }) => {
       await queryClient.cancelQueries({ queryKey: ["playlist"] });
       queryClient.setQueryData(["playlist"], (oldData: Map<string, Music[]>) => {

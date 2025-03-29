@@ -8,6 +8,7 @@ export const useStore = create<{
 
   actions: {
     setNowPlaying: (musics: Music[]) => void;
+    setNowPlayingIndex: (index: number) => void;
     nextMusic: () => void;
     prevMusic: () => void;
   };
@@ -19,6 +20,9 @@ export const useStore = create<{
       actions: {
         setNowPlaying: (musics) => {
           set({ nowPlaying: musics, nowPlayingIndex: 0 });
+        },
+        setNowPlayingIndex: (index) => {
+          set((state) => ({ nowPlayingIndex: index % state.nowPlaying.length }));
         },
         nextMusic: () => set((state) => ({ nowPlayingIndex: (state.nowPlayingIndex + 1) % state.nowPlaying.length })),
         prevMusic: () =>

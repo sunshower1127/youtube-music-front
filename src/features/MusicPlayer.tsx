@@ -1,9 +1,6 @@
 import useRefCallback from "@/lib/sw-toolkit/hooks/useRefCallback.ts";
-import { second } from "@/lib/sw-toolkit/utils/time.ts";
 import r2 from "@/services/r2.ts";
 import { useStore } from "@/zustand/store.ts";
-
-import { delay } from "es-toolkit";
 
 export default function MusicPlayer() {
   const nowPlaying = useStore((state) => state.nowPlaying);
@@ -31,9 +28,9 @@ export default function MusicPlayer() {
       navigator.mediaSession.setActionHandler("nexttrack", () => nextMusic());
       navigator.mediaSession.setActionHandler("play", async () => {
         await element.play();
-        element.pause();
-        await delay(0.5 * second);
-        element.play();
+        // element.pause();
+        // await delay(0.5 * second);
+        // element.play();
       }); // element.play 만 넣어주면 에러남. play안에 있는 this쪽에서 문제 생기는듯.
       navigator.mediaSession.setActionHandler("pause", () => element.pause());
     },
@@ -42,7 +39,7 @@ export default function MusicPlayer() {
 
   return (
     <div
-      className="flex justify-end flex-col items-center aspect-square w-full"
+      className="flex justify-end flex-col items-center aspect-square w-dvw max-w-100"
       style={{
         backgroundImage: `url(${thumbnailURL})`,
         backgroundSize: "cover",

@@ -14,7 +14,7 @@ export default function MusicLibrary() {
     createPlaylist({ playlistName, musics: Object.keys(selection).map((key) => musicLibrary[Number(key)]) });
   };
   return (
-    <section>
+    <section className="w-dvw">
       <h2 className="text-2xl font-bold">Music Library</h2>
       <MusicTable musics={musicLibrary} selection={selection} onSelectionChange={setSelection} />
       <Button onClick={handleAddPlaylist}>Add Playlist</Button>

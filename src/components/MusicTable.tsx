@@ -58,6 +58,13 @@ const columns: ColumnDef<Music>[] = [
   },
 ];
 
+const displayName = {
+  metadata_meanHue: "Cover",
+  artist: "Artist",
+  title: "Title",
+  metadata_moodValue: "Mood",
+};
+
 function ToggleHeader({ children, column }: { children: ReactNode; column: Column<Music> }) {
   const isSorted = column.getIsSorted();
   let Icon, handleClick;
@@ -87,10 +94,12 @@ export function MusicTable({
   musics,
   selection,
   onSelectionChange,
+  onRowClick,
 }: {
   musics: Music[];
-  selection: Record<number, boolean>;
+  selection?: Record<number, boolean>;
   onSelectionChange?: OnChangeFn<RowSelectionState>;
+  onRowClick?: (index: number) => void;
 }) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -116,7 +125,6 @@ export function MusicTable({
 
   return (
     <div className="flex flex-col w-full p-2 border gap-2">
-      <pre>{JSON.stringify(sorting, null, 2)}</pre>
       <div className="grid grid-cols-2 grid-rows-2 gap-x-2 h-12 mb-4">
         <label className="text-sm font-light" htmlFor="artist">
           Artist
@@ -137,6 +145,20 @@ export function MusicTable({
           onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)}
         />
       </div>
+      <div className="flex flex-row h-10 items-center ">
+        <h3 className="text-xs">Sort: </h3>
+        <ul className="flex flex-row gap-2">
+          {sorting.map(({ id, desc }) => {
+            const name = displayName[id as keyof typeof displayName];
+            return (
+              <li className="flex flex-row gap-1 items-center" key={id}>
+                <span className="text-xs font-thin">{name}</span>
+                {desc ? <CircleArrowDownIcon size="12" /> : <CircleArrowUpIcon size="12" />}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -155,7 +177,7 @@ export function MusicTable({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"} onClick={() => onRowClick?.(row.index)}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                   ))}
