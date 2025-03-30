@@ -22,8 +22,7 @@ export default function Playlist() {
   };
 
   return (
-    <section className="w-dvw">
-      <h2 className="text-2xl font-bold">Playlist</h2>
+    <section className="w-dvw flex flex-col gap-5">
       <Select value={playlistName} onValueChange={setPlaylistName}>
         <SelectTrigger>
           <SelectValue placeholder="Select a playlist" />
@@ -39,9 +38,9 @@ export default function Playlist() {
 
       <MusicTable musics={playlists.get(playlistName) || []} selection={selection} onSelectionChange={setSelection} />
       <div className="flex flex-row gap-2">
-        <Button onClick={handleListen}>Listen</Button>
+        <Button onClick={handleListen}>Replace Now Playing</Button>
         <Button variant="destructive" onClick={handleDelete}>
-          Delete
+          Delete Playlist
         </Button>
       </div>
     </section>

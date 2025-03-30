@@ -1,4 +1,5 @@
 import { Music } from "@/types/music.ts";
+import { shuffle } from "es-toolkit";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -11,6 +12,10 @@ export const useStore = create<{
     setNowPlayingIndex: (index: number) => void;
     nextMusic: () => void;
     prevMusic: () => void;
+    shuffleNowPlaying: () => void;
+    addMusic: (music: Music) => void;
+    removeMusics: (selection: Record<number, boolean>) => void;
+    clearNowPlaying: () => void;
   };
 }>()(
   persist(
@@ -29,6 +34,27 @@ export const useStore = create<{
           set((state) => ({
             nowPlayingIndex: (state.nowPlayingIndex - 1 + state.nowPlaying.length) % state.nowPlaying.length,
           })),
+        shuffleNowPlaying: () =>
+          set((state) => ({
+            nowPlaying: shuffle(state.nowPlaying),
+            nowPlayingIndex: 0,
+          })),
+        addMusic: (music) => {
+          set((state) => {
+            const newMusics = [...state.nowPlaying, music];
+            return { nowPlaying: newMusics, nowPlayingIndex: state.nowPlayingIndex };
+          });
+        },
+        removeMusics: (selection) => {
+          set((state) => {
+            const newMusics = state.nowPlaying.filter((_, index) => !selection[index]);
+            const newIndex = Math.min(state.nowPlayingIndex, newMusics.length - 1);
+            return { nowPlaying: newMusics, nowPlayingIndex: newIndex };
+          });
+        },
+        clearNowPlaying: () => {
+          set({ nowPlaying: [], nowPlayingIndex: 0 });
+        },
       },
     }),
     {

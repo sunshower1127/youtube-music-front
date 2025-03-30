@@ -1,5 +1,6 @@
 import r2 from "@/services/r2";
 import { Music } from "@/types/music";
+import { HeartPulse } from "lucide-react";
 
 import {
   Column,
@@ -7,7 +8,6 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   OnChangeFn,
   RowSelectionState,
@@ -16,7 +16,6 @@ import {
 } from "@tanstack/react-table";
 import { CircleArrowDownIcon, CircleArrowUpIcon, CircleDotIcon } from "lucide-react";
 import { ReactNode, useState } from "react";
-import { Button } from "./ui/button";
 import { Checkbox } from "./ui/checkbox.tsx";
 import { Input } from "./ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
@@ -26,12 +25,20 @@ const columns: ColumnDef<Music>[] = [
     id: "select",
     header: ({ table }) => (
       <Checkbox
+        className="mx-[2px] size-6"
         checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
       />
     ),
-    cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />,
+    cell: ({ row }) => (
+      <Checkbox
+        className="mx-[2px] size-6"
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
     enableSorting: false,
     enableHiding: false,
   },
@@ -53,7 +60,11 @@ const columns: ColumnDef<Music>[] = [
   },
   {
     accessorKey: "metadata.moodValue",
-    header: ({ column }) => <ToggleHeader column={column}>Mood</ToggleHeader>,
+    header: ({ column }) => (
+      <ToggleHeader column={column}>
+        <HeartPulse className="-m-0.5 size-5 fill-zinc-400 stroke-zinc-950" />
+      </ToggleHeader>
+    ),
     cell: ({ row }) => <div>{row.original.metadata.moodValue}</div>,
   },
 ];
@@ -83,7 +94,7 @@ function ToggleHeader({ children, column }: { children: ReactNode; column: Colum
   }
 
   return (
-    <button className="flex items-center gap-2" onClick={handleClick}>
+    <button className="flex items-center gap-1" onClick={handleClick}>
       {children}
       <Icon size="15" />
     </button>
@@ -108,7 +119,6 @@ export function MusicTable({
     columns,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onRowSelectionChange: onSelectionChange,
@@ -116,21 +126,16 @@ export function MusicTable({
       sorting,
       rowSelection: selection,
     },
-    initialState: {
-      pagination: {
-        pageSize: 20,
-      },
-    },
   });
 
   return (
-    <div className="flex flex-col w-full p-2 border gap-2">
+    <div className="flex flex-col w-full gap-2 **:text-xs">
       <div className="grid grid-cols-2 grid-rows-2 gap-x-2 h-12 mb-4">
         <label className="text-sm font-light" htmlFor="artist">
           Artist
         </label>
         <label className="text-sm font-light" htmlFor="title">
-          Song
+          Title
         </label>
         <Input
           className="h-8"
@@ -146,7 +151,7 @@ export function MusicTable({
         />
       </div>
       <div className="flex flex-row h-10 items-center ">
-        <h3 className="text-xs">Sort: </h3>
+        <h3 className="text-xs mr-1">Sort: </h3>
         <ul className="flex flex-row gap-2">
           {sorting.map(({ id, desc }) => {
             const name = displayName[id as keyof typeof displayName];
@@ -196,14 +201,6 @@ export function MusicTable({
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="space-x-2">
-          <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-            Previous
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-            Next
-          </Button>
         </div>
       </div>
     </div>

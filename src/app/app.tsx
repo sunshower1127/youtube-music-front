@@ -1,15 +1,15 @@
 import { ThemeProvider } from "@/features/ThemeProvider";
-import Home from "@/pages/home";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./app.css";
 import ReactQueryProvider from "./react-query";
+import Router from "./react-router.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ReactQueryProvider>
       <ThemeProvider>
-        <Home />
+        <Router />
       </ThemeProvider>
     </ReactQueryProvider>
   </StrictMode>
