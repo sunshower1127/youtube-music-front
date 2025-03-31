@@ -45,10 +45,12 @@ export default function MusicPlayer() {
 
   return (
     <div
-      className="flex justify-end flex-col items-center aspect-square w-dvw max-w-[calc(100dvh-5.5rem)]"
+      className="flex justify-end flex-col items-center w-dvw max-w-[calc(100dvh-5.5rem)] aspect-square"
       style={{
         backgroundImage: `url(${thumbnailURL})`,
-        backgroundSize: "cover",
+        backgroundSize: "contain",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
         textShadow: "2px 2px 2px gray",
       }}
     >
