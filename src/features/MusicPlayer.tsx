@@ -12,8 +12,6 @@ export default function MusicPlayer() {
   const musicURL = r2.getMusicURL(nowPlaying[index]);
   const thumbnailURL = r2.getThumbnailURL(nowPlaying[index]);
 
-  console.log("MusicPlayer", { artist, title, musicURL, thumbnailURL });
-
   const handleRef = useRefCallback<"audio">(
     ({ element }) => {
       if (!("mediaSession" in navigator)) return;
@@ -47,7 +45,7 @@ export default function MusicPlayer() {
     <div
       className="flex justify-end flex-col items-center w-dvw max-w-[calc(100dvh-5.5rem)] aspect-square"
       style={{
-        backgroundImage: `url(${thumbnailURL})`,
+        backgroundImage: `url("${thumbnailURL}")`, // 여기서 큰 따옴표로 안감싸주면 url에 있는 작음 따움표가 에러일으킬 수 있음
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",

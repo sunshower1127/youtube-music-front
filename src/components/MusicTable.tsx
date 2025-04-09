@@ -10,12 +10,13 @@ import {
   getFilteredRowModel,
   getSortedRowModel,
   OnChangeFn,
+  RowModel,
   RowSelectionState,
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
 import { CircleArrowDownIcon, CircleArrowUpIcon, CircleDotIcon } from "lucide-react";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Checkbox } from "./ui/checkbox.tsx";
 import { Input } from "./ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
@@ -106,18 +107,26 @@ export function MusicTable({
   selection,
   onSelectionChange,
   onRowClick,
+  sorting,
+  setSorting,
+  setRowModel,
 }: {
   musics: Music[];
   selection?: Record<number, boolean>;
   onSelectionChange?: OnChangeFn<RowSelectionState>;
   onRowClick?: (index: number) => void;
+  sorting?: SortingState;
+  setSorting?: React.Dispatch<React.SetStateAction<SortingState>>;
+  setRowModel?: React.Dispatch<React.SetStateAction<RowModel<Music> | undefined>>;
 }) {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [_sorting, _setSorting] = useState<SortingState>([]);
+  sorting = sorting ?? _sorting;
+  setSorting = setSorting ?? _setSorting;
 
   const table = useReactTable({
     data: musics,
     columns,
-    onSortingChange: setSorting,
+    onSortingChange: setSorting ?? _setSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -127,6 +136,10 @@ export function MusicTable({
       rowSelection: selection,
     },
   });
+
+  useEffect(() => {
+    setRowModel?.(table.getRowModel());
+  }, [setRowModel, table, sorting]);
 
   return (
     <div className="flex flex-col w-full gap-2 **:text-xs">

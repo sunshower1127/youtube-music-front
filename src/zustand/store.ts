@@ -36,7 +36,7 @@ export const useStore = create<{
           })),
         shuffleNowPlaying: () =>
           set((state) => ({
-            nowPlaying: chunk(chunk(state.nowPlaying, 2).flatMap(shuffle), 3).flatMap(shuffle), // 소극적 셔플
+            nowPlaying: chunk(chunk(chunk(state.nowPlaying, 2).flatMap(shuffle), 3).flatMap(shuffle), 5).flatMap(shuffle), // 소극적 셔플
             nowPlayingIndex: 0,
           })),
         addMusic: (music) => {
