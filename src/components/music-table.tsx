@@ -18,8 +18,8 @@ import {
 import { CircleArrowDownIcon, CircleArrowUpIcon, CircleDotIcon } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import { Checkbox } from "./ui/checkbox.tsx";
-import { Input } from "./ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { Input } from "./ui/input.tsx";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table.tsx";
 
 const columns: ColumnDef<Music>[] = [
   {

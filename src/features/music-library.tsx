@@ -1,4 +1,4 @@
-import { MusicTable } from "@/components/MusicTable.tsx";
+import { MusicTable } from "@/components/music-table";
 import { Button } from "@/components/ui/button.tsx";
 import { useMusicLibrary, usePlaylist } from "@/hooks/react-query.ts";
 import { isEmpty } from "@/lib/sw-toolkit/utils/utils.ts";

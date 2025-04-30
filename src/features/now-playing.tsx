@@ -1,4 +1,4 @@
-import { MusicTable } from "@/components/MusicTable.tsx";
+import { MusicTable } from "@/components/music-table";
 import { Button } from "@/components/ui/button.tsx";
 import { Music } from "@/types/music.ts";
 import { useStore } from "@/zustand/store.ts";
@@ -15,12 +15,18 @@ export default function NowPlaying() {
   const [rowModel, setRowModel] = useState<RowModel<Music>>();
 
   useEffect(() => {
-    if (rowModel) {
-      const newMusics = rowModel.rows.map((row) => row.original);
+    try {
+      if (rowModel) {
+        const newMusics = rowModel.rows.map((row) => row.original);
 
-      if (!isEqual(nowPlaying, newMusics)) {
-        console.log("nowplaying changed");
-        setNowPlaying(newMusics);
+        if (!isEqual(nowPlaying, newMusics)) {
+          console.log("nowplaying changed");
+          setNowPlaying(newMusics);
+        }
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("NowPlaying: " + error.message);
       }
     }
   }, [rowModel, setNowPlaying, nowPlaying]);

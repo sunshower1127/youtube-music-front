@@ -6,6 +6,7 @@ import { persist } from "zustand/middleware";
 export const useStore = create<{
   nowPlaying: Music[];
   nowPlayingIndex: number;
+  errorLog: string[];
 
   actions: {
     setNowPlaying: (musics: Music[]) => void;
@@ -16,12 +17,15 @@ export const useStore = create<{
     addMusic: (music: Music) => void;
     removeMusics: (selection: Record<number, boolean>) => void;
     clearNowPlaying: () => void;
+    addErrorLog: (error: string) => void;
+    clearErrorLog: () => void;
   };
 }>()(
   persist(
     (set) => ({
       nowPlaying: [],
       nowPlayingIndex: 0,
+      errorLog: [],
       actions: {
         setNowPlaying: (musics) => {
           set({ nowPlaying: musics, nowPlayingIndex: 0 });
@@ -55,11 +59,20 @@ export const useStore = create<{
         clearNowPlaying: () => {
           set({ nowPlaying: [], nowPlayingIndex: 0 });
         },
+        addErrorLog: (error) => {
+          set((state) => {
+            const newErrorLog = [...state.errorLog, error];
+            return { errorLog: newErrorLog };
+          });
+        },
+        clearErrorLog: () => {
+          set({ errorLog: [] });
+        },
       },
     }),
     {
       name: "ytmdl",
-      partialize: ({ nowPlaying, nowPlayingIndex }) => ({ nowPlaying, nowPlayingIndex }),
+      partialize: ({ nowPlaying, nowPlayingIndex, errorLog }) => ({ nowPlaying, nowPlayingIndex, errorLog }),
     }
   )
 );

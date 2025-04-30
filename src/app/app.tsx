@@ -1,4 +1,4 @@
-import { ThemeProvider } from "@/features/ThemeProvider";
+import { ThemeProvider } from "@/features/theme-provider.tsx";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./app.css";

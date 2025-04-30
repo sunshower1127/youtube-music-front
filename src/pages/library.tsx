@@ -1,4 +1,4 @@
-import MusicLibrary from "@/features/MusicLibrary.tsx";
+import MusicLibrary from "@/features/music-library";
 
 export default function LibraryPage() {
   return <MusicLibrary />;

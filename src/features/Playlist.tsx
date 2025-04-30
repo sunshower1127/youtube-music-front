@@ -1,6 +1,6 @@
-import { MusicTable } from "@/components/MusicTable.tsx";
+import { MusicTable } from "@/components/music-table";
 import { Button } from "@/components/ui/button.tsx";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/Select.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { usePlaylist } from "@/hooks/react-query.ts";
 import { useStore } from "@/zustand/store.ts";
 import { useState } from "react";
