@@ -13,11 +13,41 @@ export default function MusicPlayer() {
   const thumbnailURL = r2.getThumbnailURL(nowPlaying[index]);
 
   const handleRef = useRefCallback<"audio">(
-    ({ element }) => {
+    ({ element, defer }) => {
       if (!("mediaSession" in navigator)) {
         addErrorLog("Media Session is not detected");
         return;
       }
+
+      const handlePlay = () => {
+        navigator.mediaSession.playbackState = "playing";
+      };
+
+      element.addEventListener("play", handlePlay);
+      defer(() => {
+        element.removeEventListener("play", handlePlay);
+      });
+
+      const handlePause = () => {
+        navigator.mediaSession.playbackState = "paused";
+      };
+      element.addEventListener("pause", handlePause);
+      defer(() => {
+        element.removeEventListener("pause", handlePause);
+      });
+
+      const handleTimeUpdate = () => {
+        navigator.mediaSession.setPositionState({
+          duration: element.duration || 0,
+          playbackRate: element.playbackRate,
+          position: element.currentTime,
+        });
+      };
+
+      element.addEventListener("timeupdate", handleTimeUpdate);
+      defer(() => {
+        element.removeEventListener("timeupdate", handleTimeUpdate);
+      });
 
       try {
         navigator.mediaSession.metadata = new MediaMetadata({
@@ -48,20 +78,30 @@ export default function MusicPlayer() {
           try {
             // 현재 오디오가 재생 가능한 상태인지 확인
             if (element.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
-              element.play().catch((error) => {
-                if (error instanceof Error) {
-                  addErrorLog("MusicPlayer:play: " + error.message);
-                }
-              });
+              element
+                .play()
+                .catch((error) => {
+                  if (error instanceof Error) {
+                    addErrorLog("MusicPlayer:play: " + error.message);
+                  }
+                })
+                .then(() => {
+                  navigator.mediaSession.playbackState = "playing";
+                });
             } else {
               addErrorLog("MusicPlayer:play: Not enough data to play");
               // 충분한 버퍼가 찰 때까지 기다렸다가 재생
               const onCanPlay = () => {
-                element.play().catch((error) => {
-                  if (error instanceof Error) {
-                    addErrorLog("MusicPlayer:play: " + error.message);
-                  }
-                });
+                element
+                  .play()
+                  .catch((error) => {
+                    if (error instanceof Error) {
+                      addErrorLog("MusicPlayer:play: " + error.message);
+                    }
+                  })
+                  .then(() => {
+                    navigator.mediaSession.playbackState = "playing";
+                  });
               };
               element.addEventListener("canplay", onCanPlay, { once: true });
             }
@@ -74,11 +114,21 @@ export default function MusicPlayer() {
         navigator.mediaSession.setActionHandler("pause", () => {
           try {
             element.pause();
+            navigator.mediaSession.playbackState = "paused";
           } catch (error) {
             if (error instanceof Error) {
               addErrorLog("MusicPlayer:pause: " + error.message);
             }
           }
+        });
+
+        navigator.mediaSession.setActionHandler("seekto", (details) => {
+          element.currentTime = details.seekTime!;
+          navigator.mediaSession.setPositionState({
+            duration: element.duration || 0,
+            playbackRate: element.playbackRate,
+            position: element.currentTime,
+          });
         });
       } catch (error) {
         if (error instanceof Error) {
