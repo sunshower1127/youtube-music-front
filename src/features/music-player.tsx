@@ -1,11 +1,12 @@
 import useRefCallback from "@/lib/sw-toolkit/hooks/useRefCallback.ts";
 import r2 from "@/services/r2.ts";
 import { useStore } from "@/zustand/store.ts";
+import { delay, retry, withTimeout } from "es-toolkit";
 
 export default function MusicPlayer() {
   const nowPlaying = useStore((state) => state.nowPlaying);
   const index = useStore((state) => state.nowPlayingIndex);
-  const { prevMusic, nextMusic, addErrorLog } = useStore((state) => state.actions);
+  const { prevMusic, nextMusic } = useStore((state) => state.actions);
 
   const artist = nowPlaying[index]?.artist;
   const title = nowPlaying[index]?.title;
@@ -13,130 +14,41 @@ export default function MusicPlayer() {
   const thumbnailURL = r2.getThumbnailURL(nowPlaying[index]);
 
   const handleRef = useRefCallback<"audio">(
-    ({ element, defer }) => {
-      if (!("mediaSession" in navigator)) {
-        addErrorLog("Media Session is not detected");
-        return;
-      }
+    ({ element, isNotMounted }) => {
+      if (!navigator.mediaSession) return;
 
-      const handlePlay = () => {
-        navigator.mediaSession.playbackState = "playing";
-      };
-
-      element.addEventListener("play", handlePlay);
-      defer(() => {
-        element.removeEventListener("play", handlePlay);
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title,
+        artist,
+        artwork: [{ src: thumbnailURL!, type: "image/webp" }],
       });
 
-      const handlePause = () => {
-        navigator.mediaSession.playbackState = "paused";
-      };
-      element.addEventListener("pause", handlePause);
-      defer(() => {
-        element.removeEventListener("pause", handlePause);
-      });
+      (async () => {
+        for (let i = 0; i < 10; i++) {
+          if (isNotMounted()) return;
+          element.src = musicURL!;
+          await delay(1000);
+        }
+      })();
 
-      const handleTimeUpdate = () => {
+      navigator.mediaSession.setActionHandler("previoustrack", () => prevMusic());
+      navigator.mediaSession.setActionHandler("nexttrack", () => nextMusic());
+      navigator.mediaSession.setActionHandler("play", () => {
+        retry(() => withTimeout(() => element.play(), 1000), 10);
+      });
+      navigator.mediaSession.setActionHandler("pause", () => {
+        retry(async () => element.pause(), { delay: 1000, retries: 10 });
+      });
+      navigator.mediaSession.setActionHandler("seekto", (details) => {
+        element.currentTime = details.seekTime!;
         navigator.mediaSession.setPositionState({
           duration: element.duration || 0,
           playbackRate: element.playbackRate,
           position: element.currentTime,
         });
-      };
-
-      element.addEventListener("timeupdate", handleTimeUpdate);
-      defer(() => {
-        element.removeEventListener("timeupdate", handleTimeUpdate);
       });
-
-      try {
-        navigator.mediaSession.metadata = new MediaMetadata({
-          title,
-          artist,
-          artwork: [{ src: thumbnailURL!, type: "image/webp" }],
-        });
-
-        navigator.mediaSession.setActionHandler("previoustrack", () => {
-          try {
-            prevMusic();
-          } catch (error) {
-            if (error instanceof Error) {
-              addErrorLog("MusicPlayer:previoustrack: " + error.message);
-            }
-          }
-        });
-        navigator.mediaSession.setActionHandler("nexttrack", () => {
-          try {
-            nextMusic();
-          } catch (error) {
-            if (error instanceof Error) {
-              addErrorLog("MusicPlayer:nexttrack: " + error.message);
-            }
-          }
-        });
-        navigator.mediaSession.setActionHandler("play", () => {
-          try {
-            // 현재 오디오가 재생 가능한 상태인지 확인
-            if (element.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
-              element
-                .play()
-                .catch((error) => {
-                  if (error instanceof Error) {
-                    addErrorLog("MusicPlayer:play: " + error.message);
-                  }
-                })
-                .then(() => {
-                  navigator.mediaSession.playbackState = "playing";
-                });
-            } else {
-              addErrorLog("MusicPlayer:play: Not enough data to play");
-              // 충분한 버퍼가 찰 때까지 기다렸다가 재생
-              const onCanPlay = () => {
-                element
-                  .play()
-                  .catch((error) => {
-                    if (error instanceof Error) {
-                      addErrorLog("MusicPlayer:play: " + error.message);
-                    }
-                  })
-                  .then(() => {
-                    navigator.mediaSession.playbackState = "playing";
-                  });
-              };
-              element.addEventListener("canplay", onCanPlay, { once: true });
-            }
-          } catch (error) {
-            if (error instanceof Error) {
-              addErrorLog("MusicPlayer:play: " + error.message);
-            }
-          }
-        });
-        navigator.mediaSession.setActionHandler("pause", () => {
-          try {
-            element.pause();
-            navigator.mediaSession.playbackState = "paused";
-          } catch (error) {
-            if (error instanceof Error) {
-              addErrorLog("MusicPlayer:pause: " + error.message);
-            }
-          }
-        });
-
-        navigator.mediaSession.setActionHandler("seekto", (details) => {
-          element.currentTime = details.seekTime!;
-          navigator.mediaSession.setPositionState({
-            duration: element.duration || 0,
-            playbackRate: element.playbackRate,
-            position: element.currentTime,
-          });
-        });
-      } catch (error) {
-        if (error instanceof Error) {
-          addErrorLog("MusicPlayer: " + error.message);
-        }
-      }
     },
-    [artist, title]
+    [musicURL]
   );
 
   return (

@@ -1,6 +1,6 @@
 import MusicPlayer from "@/features/music-player";
 import ErrorBoundary from "@/lib/sw-toolkit/components/ErrorBoundary.tsx";
-import { CassetteTape, Disc3, SquareLibrary, TriangleAlert } from "lucide-react";
+import { CassetteTape, Disc3, SquareLibrary } from "lucide-react";
 import { Suspense } from "react";
 import { NavLink, Outlet } from "react-router";
 
@@ -31,12 +31,6 @@ export default function Layout() {
             <NavLink className="flex flex-col items-center h-20" to="/library">
               <SquareLibrary />
               <span className="">Library</span>
-            </NavLink>
-          </li>
-          <li>
-            <NavLink className="flex flex-col items-center h-20" to="/error-page">
-              <TriangleAlert />
-              <span className="">Error Page</span>
             </NavLink>
           </li>
         </ul>
