@@ -25,7 +25,7 @@ export default defineConfig({
             },
             handler: "CacheFirst",
             options: {
-              cacheName: "thumbnails",
+              cacheName: "thumbnail",
               expiration: {
                 maxEntries: 1000,
                 maxAgeSeconds: 60 * 60 * 24 * 30 * 12, // 1 year
@@ -42,9 +42,9 @@ export default defineConfig({
             },
             handler: "CacheFirst",
             options: {
-              cacheName: "music-files",
+              cacheName: "music",
               fetchOptions: {
-                headers: [["Range", ""]],
+                headers: [["Range", ""]], // range 요청 무시 -> partial content 요청시 캐싱이 제대로 안되는 버그 있음
               },
 
               // rangeRequests 옵션 제거

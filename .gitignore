@@ -27,3 +27,5 @@ dist-ssr
 
 .firebase
 **/secrets/*
+
+dev-dist
