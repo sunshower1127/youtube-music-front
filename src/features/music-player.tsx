@@ -1,9 +1,13 @@
 import useRefCallback from "@/lib/sw-toolkit/hooks/useRefCallback.ts";
+import useSafeEffect from "@/lib/sw-toolkit/hooks/useSafeEffect";
+import useSafeInterval from "@/lib/sw-toolkit/hooks/useSafeInterval";
 import r2 from "@/services/r2.ts";
 import { useStore } from "@/zustand/store.ts";
-import { delay, retry, withTimeout } from "es-toolkit";
+import { delay } from "es-toolkit";
+import { useEffect, useRef } from "react";
 
 export default function MusicPlayer() {
+  const audioRef = useRef<HTMLAudioElement>(null);
   const nowPlaying = useStore((state) => state.nowPlaying);
   const index = useStore((state) => state.nowPlayingIndex);
   const { prevMusic, nextMusic } = useStore((state) => state.actions);
@@ -14,31 +18,29 @@ export default function MusicPlayer() {
   const thumbnailURL = r2.getThumbnailURL(nowPlaying[index]);
 
   const handleRef = useRefCallback<"audio">(
-    ({ element, isNotMounted }) => {
+    ({ element, defer }) => {
+      audioRef.current = element;
+
+      const handleLoadedMetadata = () => {
+        // 트랙이 변경될 때마다 positionState 초기화
+        navigator.mediaSession.setPositionState({
+          duration: element.duration || 0,
+          playbackRate: element.playbackRate,
+          position: 0, // 위치를 0으로 초기화
+        });
+        element.play();
+      };
+
+      element.addEventListener("loadedmetadata", handleLoadedMetadata);
+      defer(() => element.removeEventListener("loadedmetadata", handleLoadedMetadata));
+
       if (!navigator.mediaSession) return;
-
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title,
-        artist,
-        artwork: [{ src: thumbnailURL!, type: "image/webp" }],
-      });
-
-      (async () => {
-        for (let i = 0; i < 10; i++) {
-          if (isNotMounted()) return;
-          element.src = musicURL!;
-          await delay(1000);
-        }
-      })();
-
       navigator.mediaSession.setActionHandler("previoustrack", () => prevMusic());
-      navigator.mediaSession.setActionHandler("nexttrack", () => nextMusic());
-      navigator.mediaSession.setActionHandler("play", () => {
-        retry(() => withTimeout(() => element.play(), 1000), 10);
+      navigator.mediaSession.setActionHandler("nexttrack", () => {
+        nextMusic();
       });
-      navigator.mediaSession.setActionHandler("pause", () => {
-        retry(async () => element.pause(), { delay: 1000, retries: 10 });
-      });
+      navigator.mediaSession.setActionHandler("play", () => element.play());
+      navigator.mediaSession.setActionHandler("pause", () => element.pause());
       navigator.mediaSession.setActionHandler("seekto", (details) => {
         element.currentTime = details.seekTime!;
         navigator.mediaSession.setPositionState({
@@ -50,6 +52,30 @@ export default function MusicPlayer() {
     },
     [musicURL]
   );
+
+  useEffect(() => {
+    if (!navigator.mediaSession) return;
+
+    if (!audioRef.current) return;
+    audioRef.current.src = musicURL!;
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title,
+      artist,
+      artwork: [{ src: thumbnailURL!, type: "image/webp" }],
+    });
+  }, [artist, musicURL, thumbnailURL, title]);
+
+  // 의미없는 interval로 절전모드 방지?
+
+  useSafeInterval(() => {}, [], 1000);
+
+  useSafeEffect(async ({ isNotMounted }) => {
+    while (true) {
+      if (isNotMounted()) return;
+      await delay(1000);
+    }
+  }, []);
 
   return (
     <div
@@ -75,7 +101,7 @@ export default function MusicPlayer() {
           {">>"}
         </div>
       </div>
-      <audio className="mb-1 shadow-2xl" ref={handleRef} autoPlay controls src={musicURL!} onEnded={nextMusic} />
+      <audio className="mb-1 shadow-2xl" ref={handleRef} controls src={musicURL!} onEnded={nextMusic} />
     </div>
   );
 }

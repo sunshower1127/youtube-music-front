@@ -82,7 +82,7 @@ define(['./workbox-ce4f0d5f'], (function (workbox) { 'use strict';
     "revision": "3ca0b8505b4bec776b69afdba2768812"
   }, {
     "url": "index.html",
-    "revision": "0.8a5iv2pj6"
+    "revision": "0.e4uf683u48g"
   }], {});
   workbox.cleanupOutdatedCaches();
   workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {
@@ -93,7 +93,7 @@ define(['./workbox-ce4f0d5f'], (function (workbox) { 'use strict';
   }) => {
     return url.hostname === "ytmdl-music-server.vercel.app" && url.pathname.includes("/api/thumbnail");
   }, new workbox.CacheFirst({
-    "cacheName": "thumbnails",
+    "cacheName": "thumbnail",
     plugins: [new workbox.ExpirationPlugin({
       maxEntries: 1000,
       maxAgeSeconds: 31104000
@@ -106,7 +106,7 @@ define(['./workbox-ce4f0d5f'], (function (workbox) { 'use strict';
   }) => {
     return url.hostname === "ytmdl-music-server.vercel.app" && url.pathname.includes("/api/music");
   }, new workbox.CacheFirst({
-    "cacheName": "music-files",
+    "cacheName": "music",
     "fetchOptions": {
       "headers": [["Range", ""]]
     },
