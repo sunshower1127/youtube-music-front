@@ -33,15 +33,6 @@ export default function NowPlaying() {
 
   return (
     <section className="w-dvw flex flex-col gap-2">
-      <MusicTable
-        musics={nowPlaying}
-        selection={selection}
-        onSelectionChange={setSelection}
-        onRowClick={setNowPlayingIndex}
-        sorting={sorting}
-        setSorting={setSorting}
-        setRowModel={setRowModel}
-      />
       <div className="flex flex-row gap-2">
         <Button
           onClick={() => {
@@ -58,6 +49,15 @@ export default function NowPlaying() {
           Clear
         </Button>
       </div>
+      <MusicTable
+        musics={nowPlaying}
+        selection={selection}
+        onSelectionChange={setSelection}
+        onRowClick={setNowPlayingIndex}
+        sorting={sorting}
+        setSorting={setSorting}
+        setRowModel={setRowModel}
+      />
     </section>
   );
 }

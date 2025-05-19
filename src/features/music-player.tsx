@@ -1,9 +1,7 @@
 import useRefCallback from "@/lib/sw-toolkit/hooks/useRefCallback.ts";
-import useSafeEffect from "@/lib/sw-toolkit/hooks/useSafeEffect";
-import useSafeInterval from "@/lib/sw-toolkit/hooks/useSafeInterval";
 import r2 from "@/services/r2.ts";
 import { useStore } from "@/zustand/store.ts";
-import { delay } from "es-toolkit";
+import { delay, range } from "es-toolkit";
 import { useEffect, useRef } from "react";
 
 export default function MusicPlayer() {
@@ -18,7 +16,7 @@ export default function MusicPlayer() {
   const thumbnailURL = r2.getThumbnailURL(nowPlaying[index]);
 
   const handleRef = useRefCallback<"audio">(
-    ({ element, defer }) => {
+    ({ element }) => {
       audioRef.current = element;
 
       const handleLoadedMetadata = () => {
@@ -28,11 +26,15 @@ export default function MusicPlayer() {
           playbackRate: element.playbackRate,
           position: 0, // 위치를 0으로 초기화
         });
-        element.play();
+
+        range(4).forEach(async (i) => {
+          await delay(i * 1000);
+          element.play();
+        });
       };
 
       element.addEventListener("loadedmetadata", handleLoadedMetadata);
-      defer(() => element.removeEventListener("loadedmetadata", handleLoadedMetadata));
+      // defer(() => element.removeEventListener("loadedmetadata", handleLoadedMetadata));
 
       if (!navigator.mediaSession) return;
       navigator.mediaSession.setActionHandler("previoustrack", () => prevMusic());
@@ -65,17 +67,6 @@ export default function MusicPlayer() {
       artwork: [{ src: thumbnailURL!, type: "image/webp" }],
     });
   }, [artist, musicURL, thumbnailURL, title]);
-
-  // 의미없는 interval로 절전모드 방지?
-
-  useSafeInterval(() => {}, [], 1000);
-
-  useSafeEffect(async ({ isNotMounted }) => {
-    while (true) {
-      if (isNotMounted()) return;
-      await delay(1000);
-    }
-  }, []);
 
   return (
     <div

@@ -1,5 +1,5 @@
 import { Music } from "@/types/music.ts";
-import { chunk, shuffle } from "es-toolkit";
+import { shuffleArray } from "@/utils/shuffle";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -36,7 +36,7 @@ export const useStore = create<{
           })),
         shuffleNowPlaying: () =>
           set((state) => ({
-            nowPlaying: chunk(chunk(chunk(state.nowPlaying, 2).flatMap(shuffle), 3).flatMap(shuffle), 5).flatMap(shuffle), // 소극적 셔플
+            nowPlaying: shuffleArray(state.nowPlaying), // 소극적 셔플
             nowPlayingIndex: 0,
           })),
         addMusic: (music) => {
