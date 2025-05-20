@@ -1,7 +1,6 @@
 import useRefCallback from "@/lib/sw-toolkit/hooks/useRefCallback.ts";
 import r2 from "@/services/r2.ts";
 import { useStore } from "@/zustand/store.ts";
-import { delay, range } from "es-toolkit";
 import { useEffect, useRef } from "react";
 
 export default function MusicPlayer() {
@@ -27,10 +26,7 @@ export default function MusicPlayer() {
           position: 0, // 위치를 0으로 초기화
         });
 
-        range(4).forEach(async (i) => {
-          await delay(i * 1000);
-          element.play();
-        });
+        element.play();
       };
 
       element.addEventListener("loadedmetadata", handleLoadedMetadata);

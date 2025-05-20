@@ -17,7 +17,7 @@ function getThumbnailURL(music: Music) {
   return `${URL}/thumbnail?artist=${encodeURIComponent(music.artist)}&title=${encodeURIComponent(music.title)}`;
 }
 
-function getMusicURL(music: Music) {
+export function getMusicURL(music: Music) {
   if (!music) return null;
   return `${URL}/music?artist=${encodeURIComponent(music.artist)}&title=${encodeURIComponent(music.title)}`;
 }
