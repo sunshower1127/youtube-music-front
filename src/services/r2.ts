@@ -12,7 +12,7 @@ async function getMusicLibrary() {
   })) as Music[];
 }
 
-function getThumbnailURL(music: Music) {
+export function getThumbnailURL(music: Music) {
   if (!music) return null;
   return `${URL}/thumbnail?artist=${encodeURIComponent(music.artist)}&title=${encodeURIComponent(music.title)}`;
 }

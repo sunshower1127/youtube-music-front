@@ -1,15 +1,15 @@
 import { MusicTable } from "@/components/music-table";
 import { Button } from "@/components/ui/button.tsx";
+import { useMusicStore } from "@/features/music/store";
 import { Music } from "@/types/music.ts";
-import { useStore } from "@/zustand/store.ts";
 import { RowModel, SortingState } from "@tanstack/react-table";
 import { isEqual } from "es-toolkit";
 
 import { useEffect, useState } from "react";
 
 export default function NowPlaying() {
-  const nowPlaying = useStore((state) => state.nowPlaying);
-  const { setNowPlayingIndex, shuffleNowPlaying, removeMusics, clearNowPlaying, setNowPlaying } = useStore((state) => state.actions);
+  const nowPlaying = useMusicStore((state) => state.nowPlaying);
+  const { setNowPlayingIndex, shuffleNowPlaying, removeMusics, clearNowPlaying, setNowPlaying } = useMusicStore((state) => state.actions);
   const [selection, setSelection] = useState<Record<number, boolean>>({});
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowModel, setRowModel] = useState<RowModel<Music>>();

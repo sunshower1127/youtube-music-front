@@ -3,7 +3,7 @@ import { shuffleArray } from "@/utils/shuffle";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export const useStore = create<{
+export const useMusicStore = create<{
   nowPlaying: Music[];
   nowPlayingIndex: number;
 

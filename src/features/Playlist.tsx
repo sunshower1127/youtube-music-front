@@ -1,15 +1,15 @@
 import { MusicTable } from "@/components/music-table";
 import { Button } from "@/components/ui/button.tsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useMusicStore } from "@/features/music/store";
 import { usePlaylist } from "@/hooks/react-query.ts";
-import { useStore } from "@/zustand/store.ts";
 import { useState } from "react";
 
 export default function Playlist() {
   const { playlists, deletePlaylist } = usePlaylist();
   const [playlistName, setPlaylistName] = useState("");
   const [selection, setSelection] = useState<Record<number, boolean>>({});
-  const { setNowPlaying } = useStore((state) => state.actions);
+  const { setNowPlaying } = useMusicStore((state) => state.actions);
 
   const handleListen = () => {
     setNowPlaying(playlists.get(playlistName) || []);

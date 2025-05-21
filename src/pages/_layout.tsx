@@ -1,4 +1,4 @@
-import MusicPlayer from "@/features/music-player";
+import MusicPlayer from "@/features/music/player";
 import ErrorBoundary from "@/lib/sw-toolkit/components/ErrorBoundary.tsx";
 import { CassetteTape, Disc3, SquareLibrary } from "lucide-react";
 import { Suspense } from "react";
