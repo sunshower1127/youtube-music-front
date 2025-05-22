@@ -1,12 +1,8 @@
+import { audio } from "@/features/music/audio";
 import { getMusicURL } from "@/services/r2";
 import { Music } from "@/types/music";
 
-export function cacheMusics(
-  musics: Music[],
-  audioRef: React.RefObject<HTMLAudioElement>,
-  showModal: () => void,
-  setDialogText: (text: string) => void
-) {
+export function cacheMusics(musics: Music[], showModal: () => void, setDialogText: (text: string) => void) {
   // 서비스 워커와 캐시가 지원되는지 확인
   if (!("serviceWorker" in navigator) || !("caches" in window)) {
     setDialogText("이 브라우저는 오프라인 캐싱을 지원하지 않습니다.");
@@ -25,7 +21,7 @@ export function cacheMusics(
       const total = musics.length;
 
       // audioRef가 유효한지 확인
-      if (!audioRef || !audioRef.current) {
+      if (!audio) {
         setDialogText("오디오 요소를 찾을 수 없습니다.");
         return;
       }
@@ -49,7 +45,7 @@ export function cacheMusics(
         try {
           // audioRef 요소를 사용하여 음악 파일 캐싱
           const loadPromise = new Promise<void>((resolve, reject) => {
-            const audioElement = audioRef.current;
+            const audioElement = audio;
 
             const loadHandler = () => {
               cached++;

@@ -13,7 +13,6 @@ export default function NowPlaying() {
   const [selection, setSelection] = useState<Record<number, boolean>>({});
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowModel, setRowModel] = useState<RowModel<Music>>();
-
   useEffect(() => {
     try {
       if (rowModel) {
