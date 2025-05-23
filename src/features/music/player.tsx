@@ -17,7 +17,7 @@ export default function MusicPlayer() {
   const [dialogText, setDialogText] = useState<string>("");
 
   return (
-    <div>
+    <div className="flex flex-col gap-2 items-center">
       <div
         className="flex justify-end flex-col items-center w-dvw max-w-[calc(100dvh-5.5rem)] aspect-square"
         style={{
@@ -51,18 +51,19 @@ export default function MusicPlayer() {
         </div>
       </div>
       <button
-        className="bg-blue-500 p-1 rounded-sm"
+        className="bg-blue-400 p-2 rounded-sm"
         onClick={() =>
           cacheMusics(
             nowPlaying,
             () => dialogRef.current?.showModal(),
+            () => dialogRef.current?.close(),
             (text) => setDialogText(text)
           )
         }
       >
-        Cache all
+        Download All
       </button>
-      <dialog ref={dialogRef} className="m-auto">
+      <dialog ref={dialogRef} className="m-auto p-5 text-lg">
         {dialogText}
       </dialog>
     </div>

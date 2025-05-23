@@ -12,7 +12,7 @@ export default function Playlist() {
   const { setNowPlaying } = useMusicStore((state) => state.actions);
 
   const handleListen = () => {
-    setNowPlaying(playlists.get(playlistName) || []);
+    setNowPlaying(playlists.get(playlistName)?.filter((_, index) => selection[index]) || []);
   };
 
   const handleDelete = () => {
@@ -23,6 +23,12 @@ export default function Playlist() {
 
   return (
     <section className="w-dvw flex flex-col gap-5">
+      <div className="flex flex-row gap-2">
+        <Button onClick={handleListen}>Replace Now Playing</Button>
+        <Button variant="destructive" onClick={handleDelete}>
+          Delete Playlist
+        </Button>
+      </div>
       <Select value={playlistName} onValueChange={setPlaylistName}>
         <SelectTrigger>
           <SelectValue placeholder="Select a playlist" />
@@ -37,12 +43,6 @@ export default function Playlist() {
       </Select>
 
       <MusicTable musics={playlists.get(playlistName) || []} selection={selection} onSelectionChange={setSelection} />
-      <div className="flex flex-row gap-2">
-        <Button onClick={handleListen}>Replace Now Playing</Button>
-        <Button variant="destructive" onClick={handleDelete}>
-          Delete Playlist
-        </Button>
-      </div>
     </section>
   );
 }

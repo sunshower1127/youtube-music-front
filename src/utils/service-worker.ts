@@ -1,8 +1,9 @@
 import { audio } from "@/features/music/audio";
 import { getMusicURL } from "@/services/r2";
 import { Music } from "@/types/music";
+import { delay } from "es-toolkit";
 
-export function cacheMusics(musics: Music[], showModal: () => void, setDialogText: (text: string) => void) {
+export function cacheMusics(musics: Music[], showModal: () => void, closeModal: () => void, setDialogText: (text: string) => void) {
   // 서비스 워커와 캐시가 지원되는지 확인
   if (!("serviceWorker" in navigator) || !("caches" in window)) {
     setDialogText("이 브라우저는 오프라인 캐싱을 지원하지 않습니다.");
@@ -84,6 +85,9 @@ export function cacheMusics(musics: Music[], showModal: () => void, setDialogTex
         console.error("음악 캐싱 중 오류 발생:", error);
         setDialogText(`음악 캐싱 중 오류가 발생했습니다: ${error.message}`);
       }
+    } finally {
+      await delay(3000);
+      closeModal();
     }
   })();
 }

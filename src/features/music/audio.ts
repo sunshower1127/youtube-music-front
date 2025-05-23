@@ -5,6 +5,8 @@ import { useMusicStore } from "./store";
 export const audio = new Audio();
 const { prevMusic, nextMusic } = useMusicStore.getState().actions;
 
+audio.src = getMusicURL(useMusicStore.getState().nowPlaying[useMusicStore.getState().nowPlayingIndex]) || "";
+
 // Zustand 상태 구독 설정
 useMusicStore.subscribe(({ nowPlaying, nowPlayingIndex }) => {
   const track = nowPlaying[nowPlayingIndex];

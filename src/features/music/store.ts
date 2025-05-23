@@ -48,8 +48,10 @@ export const useMusicStore = create<{
         removeMusics: (selection) => {
           set((state) => {
             const newMusics = state.nowPlaying.filter((_, index) => !selection[index]);
-            const newIndex = Math.min(state.nowPlayingIndex, newMusics.length - 1);
-            return { nowPlaying: newMusics, nowPlayingIndex: newIndex };
+            return {
+              nowPlaying: newMusics,
+              nowPlayingIndex: 0,
+            };
           });
         },
         clearNowPlaying: () => {

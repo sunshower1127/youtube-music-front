@@ -14,11 +14,12 @@ export default function NowPlaying() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowModel, setRowModel] = useState<RowModel<Music>>();
   useEffect(() => {
+    // 뭔가 sorting 로직하고 결합이 되어있는데 얘 때문에 clear가 안먹힘
     try {
       if (rowModel) {
         const newMusics = rowModel.rows.map((row) => row.original);
 
-        if (!isEqual(nowPlaying, newMusics)) {
+        if (newMusics.length === nowPlaying.length && !isEqual(nowPlaying, newMusics)) {
           console.log("nowplaying changed");
           setNowPlaying(newMusics);
         }
