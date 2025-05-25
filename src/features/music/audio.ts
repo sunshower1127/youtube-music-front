@@ -1,5 +1,5 @@
 import { getMusicURL, getThumbnailURL } from "@/services/r2";
-import { once } from "es-toolkit";
+import { delay, once } from "es-toolkit";
 import { useMusicStore } from "./store";
 
 export const audio = new Audio();
@@ -62,7 +62,34 @@ audio.addEventListener("playing", () => handlePlaying());
 //   navigator.mediaSession.setActionHandler("nexttrack", () => nextMusic());
 // }
 
+function cacheAll(showDialog: () => void, closeDialog: () => void, setDialogText: (text: string) => void) {
+  const track = useMusicStore.getState().nowPlaying;
+  const { setNowPlayingIndex } = useMusicStore.getState().actions;
+  setNowPlayingIndex(0);
+  showDialog();
+
+  let i = 0;
+
+  const next = async () => {
+    setDialogText(`Caching track ${i} / ${track.length}...`);
+    await delay(1000); // 1초 대기
+    if (i == track.length) {
+      audio.removeEventListener("playing", next);
+      setDialogText(`All tracks cached successfully!`);
+      await delay(2000);
+      closeDialog();
+      return;
+    }
+    nextMusic();
+    i++;
+  };
+
+  audio.addEventListener("playing", next);
+  audio.play();
+}
+
 export default {
   play,
   pause,
+  cacheAll,
 };

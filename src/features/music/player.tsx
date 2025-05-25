@@ -1,6 +1,5 @@
 import { useMusicStore } from "@/features/music/store";
 import { getThumbnailURL } from "@/services/r2";
-import { cacheMusics } from "@/utils/service-worker";
 import { useRef, useState } from "react";
 import audio from "./audio";
 
@@ -53,8 +52,7 @@ export default function MusicPlayer() {
       <button
         className="bg-blue-400 p-2 rounded-sm"
         onClick={() =>
-          cacheMusics(
-            nowPlaying,
+          audio.cacheAll(
             () => dialogRef.current?.showModal(),
             () => dialogRef.current?.close(),
             (text) => setDialogText(text)
