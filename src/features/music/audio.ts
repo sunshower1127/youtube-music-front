@@ -1,5 +1,5 @@
 import { getMusicURL, getThumbnailURL } from "@/services/r2";
-import { delay, once } from "es-toolkit";
+import { delay } from "es-toolkit";
 import { useMusicStore } from "./store";
 
 export const audio = new Audio();
@@ -37,7 +37,7 @@ audio.addEventListener("ended", () => nextMusic());
 
 // 방법 1 -> 이러면 prevtrack, nexttrack 버튼이 제대로 보임. 근데 끊길 가능성?
 
-const handlePlaying = once(() => {
+const handlePlaying = () => {
   if ("mediaSession" in navigator) {
     navigator.mediaSession.setActionHandler("play", play);
     navigator.mediaSession.setActionHandler("pause", pause);
@@ -49,7 +49,7 @@ const handlePlaying = once(() => {
       }
     });
   }
-});
+};
 audio.addEventListener("playing", () => handlePlaying());
 
 // 방법 2 -> nexttrack 버튼이 이러면 안보임. 대신에 seekto가 잘 작동함.
